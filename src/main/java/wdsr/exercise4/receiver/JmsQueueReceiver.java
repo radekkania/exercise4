@@ -1,9 +1,16 @@
 package wdsr.exercise4.receiver;
 
+
+import javax.jms.Connection;
+import javax.jms.Destination;
+import javax.jms.JMSException;
+import javax.jms.MessageConsumer;
+import javax.jms.Session;
+
+import org.apache.activemq.ActiveMQConnectionFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import wdsr.exercise4.sender.JmsSender;
 
 /**
  * TODO Complete this class so that it consumes messages from the given queue and invokes the registered callback when an alert is received.
@@ -13,12 +20,32 @@ import wdsr.exercise4.sender.JmsSender;
 public class JmsQueueReceiver {
 	private static final Logger log = LoggerFactory.getLogger(JmsQueueReceiver.class);
 	
+	private final int mode = Session.AUTO_ACKNOWLEDGE;
+	private final boolean transacted = false;
+	
+	private ActiveMQConnectionFactory connectionFactory;
+	private Connection connection;
+	private Session session;
+	private Destination destination;
+	private AlertService service;
+	private MessageConsumer consumer;
+	
 	/**
 	 * Creates this object
 	 * @param queueName Name of the queue to consume messages from.
 	 */
 	public JmsQueueReceiver(final String queueName) {
-		// TODO
+		
+		try {
+			connectionFactory = new ActiveMQConnectionFactory("tcp://localhost:62616");
+			connectionFactory.setTrustAllPackages(true);
+			connection = connectionFactory.createConnection();
+			connection.start();
+			session = connection.createSession(transacted, mode);
+			destination = session.createQueue(queueName);			
+		} catch (Exception e) {
+			log.error("created filed",e);
+		}
 	}
 
 	/**
@@ -26,14 +53,26 @@ public class JmsQueueReceiver {
 	 * @param alertService Callback to be registered.
 	 */
 	public void registerCallback(AlertService alertService) {
-		// TODO
+		try {
+			this.service = alertService;
+			consumer = session.createConsumer(destination);
+			consumer.setMessageListener(new ReciveListener(service));
+		} catch (JMSException e) {
+			log.error("Callback Error", e);
+		}
 	}
 	
 	/**
 	 * Deregisters all consumers and closes the connection to JMS broker.
 	 */
 	public void shutdown() {
-		// TODO
+		try {
+			consumer.setMessageListener(null);
+			session.close();
+			connection.close();
+		} catch (JMSException e) {
+			log.error("cant close session or connection", e);
+		}
 	}
 
 	// TODO

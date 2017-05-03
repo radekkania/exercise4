@@ -151,6 +151,7 @@ public class ReceiveTest {
 		Object received = alertService.tryTakeAlert(3, TimeUnit.SECONDS);
 				
 		// then
+
 		assertTrue(received instanceof VolumeAlert);
 		assertEquals(timestamp, ((VolumeAlert)received).getTimestamp());
 		assertEquals(stock, ((VolumeAlert)received).getStock());
