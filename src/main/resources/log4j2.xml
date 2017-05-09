@@ -7,10 +7,8 @@
 	<Appenders>
 		<RollingFile name="file-log" fileName="${log-path}/main.log"
 			filePattern="${log-path}/main-%d{yyyy-MM-dd}.log">
-			<PatternLayout>
-				<pattern>%-4r [%t] %-5p %c %x - %m%n
-				</pattern>
-			</PatternLayout>
+			<PatternLayout 
+				pattern="%-4r [%t] %-5p %c %x - %m%n" />
 			<Policies>
 				<TimeBasedTriggeringPolicy interval="1"
 					modulate="true" />
