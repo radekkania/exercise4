@@ -45,33 +45,24 @@ public class JmsPersistentSender {
 	}
 	
 	public void sendPersistentMessages() {
-		try {
-			long startTime = System.currentTimeMillis();
-			for (int i=0; i<10000; ++i) {
-				TextMessage mssg = session.createTextMessage("test_" + i+1);
-				mssg.setJMSDeliveryMode(DeliveryMode.PERSISTENT);
-				producer.send(mssg);
-			}
-			long stopTime = System.currentTimeMillis();
-			long elapsedTime = stopTime - startTime;
-			String info = String.format("10000 persistent messages sent in %d milliseconds", elapsedTime);
-			log.info(info);
-		} catch (JMSException e) {
-			log.error("sending persistent messages failed", e);
-		} 
+		sendMessage(DeliveryMode.PERSISTENT, "persistent");
 	}
 	
 	public void sendNonPersistendMessages() {
+		sendMessage(DeliveryMode.NON_PERSISTENT, "non_persistent");
+	}
+	
+	private void sendMessage(int mode, String stringMode) {
 		try {
 			long startTime = System.currentTimeMillis();
 			for (int i=0; i<10000; ++i) {
 				TextMessage mssg = session.createTextMessage("test_" + i+1);
-				mssg.setJMSDeliveryMode(DeliveryMode.NON_PERSISTENT);
+				mssg.setJMSDeliveryMode(mode);
 				producer.send(mssg);
 			}
 			long stopTime = System.currentTimeMillis();
 			long elapsedTime = stopTime - startTime;
-			String info = String.format("10000 non_persistent messages sent in %d milliseconds", elapsedTime);
+			String info = String.format("10000 %s messages sent in %d milliseconds ", stringMode, elapsedTime);
 			log.info(info);
 		} catch (JMSException e) {
 			log.error("sending persistent messages failed", e);
