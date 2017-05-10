@@ -54,10 +54,10 @@ public class JmsPersistentSender {
 	
 	private void sendMessage(int mode, String stringMode) {
 		try {
+			producer.setDeliveryDelay(mode);
 			long startTime = System.currentTimeMillis();
 			for (int i=0; i<10000; ++i) {
 				TextMessage mssg = session.createTextMessage("test_" + i+1);
-				mssg.setJMSDeliveryMode(mode);
 				producer.send(mssg);
 			}
 			long stopTime = System.currentTimeMillis();
