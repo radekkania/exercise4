@@ -1,6 +1,5 @@
 package wdsr.exercise4c.subscriber;
 
-
 import javax.jms.Connection;
 import javax.jms.ConnectionFactory;
 import javax.jms.JMSException;
@@ -31,11 +30,31 @@ public class JmsSubscriber {
 
 	public JmsSubscriber() {
 		this.factory = new ActiveMQConnectionFactory("tcp://localhost:61616");
+		setUp();
+	}
+	
+	private void setUp() {
 		try {
 			this.connection = factory.createConnection();
 			this.connection.setClientID("myClientId");
 			this.session = connection.createSession(transacted, mode);
 			this.topic = session.createTopic(topicName);
+		} catch (JMSException e) {
+			log.error("failed", e);
+		} 
+	}
+		
+	public void recive() {
+		try {
+			consumer = session.createConsumer(topic);
+			connection.start();
+		} catch (JMSException e) {
+			log.error("failed");
+		} 
+	}
+	
+	public void reciveDurable() {
+		try {
 			subscriber = session.createDurableSubscriber(topic, "testSub");
 			subscriber.setMessageListener((message) -> {
 				try {
@@ -45,9 +64,10 @@ public class JmsSubscriber {
 					log.error("fail on method onMessage", e);
 				}
 			});
+			connection.start();
 		} catch (JMSException e) {
-			log.error("failed", e);
-		} 
+			log.error("durableRecie failed");
+		}
 	}
 	
 	public void closeDurableSubscriber() {
@@ -58,14 +78,6 @@ public class JmsSubscriber {
 				log.error("error occured while closing subsriber");
 			}
 		}
-	}
-	
-	public void recive() {
-		try {
-			connection.start();
-		} catch (JMSException e) {
-			log.error("failed");
-		} 
 	}
 		
 	private void shutDown() {
