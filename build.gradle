@@ -4,7 +4,7 @@ apply plugin: 'application'
 sourceCompatibility = 1.8
 version = '1.0'
 
-mainClassName = "wdsr.exercise4b.test.Main"
+mainClassName = "wdsr.exercise4c.test.Main"
 
 repositories {
     mavenCentral()
